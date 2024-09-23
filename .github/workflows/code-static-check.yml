@@ -7,15 +7,19 @@ jobs:
     steps:
       - run: echo "Checkout code to branch ${{ github.ref }}."
       - name: Check out repository code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+        with:
+          node-version: '20'
 
       - name: Installing the node engine.
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: '20'
 
       - name: Install deps
         run: yarn
+        with:
+          node-version: '20'
 
   static-checks:
     runs-on: ubuntu-latest
