@@ -33,5 +33,7 @@ export function parseSearchQueryCondition(searchQuery: SearchQueryDto) {
     condition.take = Math.max(1, searchQuery.pageSize);
   }
 
+  condition.order = { id: 'ASC' };
+
   return condition;
 }

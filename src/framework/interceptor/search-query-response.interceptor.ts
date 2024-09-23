@@ -19,9 +19,8 @@ export class SearchQueryResponseInterceptor implements NestInterceptor {
     return next.handle().pipe(
       map((data) => {
         return {
-          searchResult: data.searchResult,
-          totalCollectionSize: data.totalCollectionSize,
-          possibleToGoNextPage: data.possibleToGoNextPage,
+          searchResult: data[0],
+          totalCollectionSize: data[1],
         };
       }),
     );

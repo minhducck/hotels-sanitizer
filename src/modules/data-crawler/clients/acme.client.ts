@@ -94,16 +94,20 @@ export class AcmeClient
     page: number,
     pageSize: number,
   ) {
-    return this.apiConnector
-      .get<AcmeSource[]>(AcmeClient.BASE_URL, {
-        params: { page, pageSize, destinationIds },
-      })
-      .then(this._processAxiosResponse)
-      .then((hotels) => this._mockFilterByDestinationId(destinationIds, hotels))
-      .then((hotels) => this._mockFilterById(hotelIds, hotels))
-      .then((hotels) => this._mockPagination(page, pageSize, hotels))
-      .then((hotels) =>
-        hotels.map((hotel) => plainToInstance(AcmeSource, hotel)),
-      );
+    return (
+      this.apiConnector
+        .get<AcmeSource[]>(AcmeClient.BASE_URL, {
+          params: { page, pageSize, destinationIds },
+        })
+        .then(this._processAxiosResponse)
+        // .then((hotels) =>
+        //   this._mockFilterByDestinationId(destinationIds, hotels),
+        // )
+        // .then((hotels) => this._mockFilterById(hotelIds, hotels))
+        // .then((hotels) => this._mockPagination(page, pageSize, hotels))
+        .then((hotels) =>
+          hotels.map((hotel) => plainToInstance(AcmeSource, hotel)),
+        )
+    );
   }
 }

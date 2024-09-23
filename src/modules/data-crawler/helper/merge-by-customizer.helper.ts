@@ -1,13 +1,25 @@
 import {
   isArray,
+  isNumber,
   isObject,
   mergeWith,
   MergeWithCustomizer,
   uniq,
   uniqBy,
 } from 'lodash';
-import { HotelImages, HotelModel } from '../model/hotel.model';
+import {
+  HotelAmenities,
+  HotelImages,
+  HotelLocation,
+  HotelModel,
+} from '../model/hotel.model';
 
+/**
+ * Appends all images by types and eliminate duplication by URL.
+ *
+ * @param imageBucket
+ * @param imagesEntries
+ */
 const _mergeImageEntries = (
   imageBucket: HotelImages,
   imagesEntries: HotelImages,
@@ -24,15 +36,67 @@ const _mergeImageEntries = (
   }
 };
 
-const mergeImages = (destImages: HotelImages, sourceImages: HotelImages) => {
+/**
+ * Merge images list
+ */
+const mergeImages = (value: HotelImages, source: HotelImages) => {
   const allImages = { rooms: undefined, site: undefined, amenities: undefined };
 
   // This step make sure image seq rooms => site => amenities
-  _mergeImageEntries(allImages, destImages);
-  _mergeImageEntries(allImages, sourceImages);
+  _mergeImageEntries(allImages, value);
+  _mergeImageEntries(allImages, source);
 
   return allImages;
 };
+
+const mergeBookingConditions = (value: string[], srcValue: string[]) => {
+  return value?.length > srcValue?.length ? value : srcValue;
+};
+
+const _mergeAmenityEntry = (dest: object, src: object) => {
+  for (const roomType in src) {
+    dest[roomType] = dest[roomType] || [];
+    dest[roomType].push(...(src[roomType] || []));
+
+    // Unique Image
+    dest[roomType] = uniqBy(dest[roomType], (text: string) =>
+      text.toLowerCase(),
+    );
+  }
+};
+const mergeAmenities = (value: HotelAmenities, srcValue: HotelAmenities) => {
+  const result: HotelAmenities = {
+    general: undefined,
+    room: undefined,
+    site: undefined,
+  };
+
+  _mergeAmenityEntry(result, value);
+  _mergeAmenityEntry(result, srcValue);
+  return result;
+};
+
+const mergeLocation = (value: HotelLocation, srcValue: HotelLocation) => {
+  value.city = value.city || srcValue.city;
+  value.country = value.country || srcValue.country;
+  value.address =
+    value.address?.length > srcValue.address?.length
+      ? value.address
+      : srcValue.address;
+
+  if (srcValue.lat && srcValue.lng) {
+    value.lat = srcValue.lat;
+    value.lng = srcValue.lng;
+  }
+  return value;
+};
+
+const specialMergers = new Map<keyof HotelModel, any>([
+  ['images', mergeImages],
+  ['booking_conditions', mergeBookingConditions],
+  ['amenities', mergeAmenities],
+  ['location', mergeLocation],
+]);
 
 const mergePrimaryArray = (value: any[], srcValue: any[]) => {
   value.push(...srcValue);
@@ -44,12 +108,8 @@ export const mergeByCustomizerHelper: MergeWithCustomizer = (
   srcValue: any,
   key: keyof HotelModel,
 ) => {
-  if (key === 'images') {
-    return mergeImages(value, srcValue);
-  }
-
-  if (key === 'booking_conditions') {
-    return value?.length > srcValue?.length ? value : srcValue;
+  if (specialMergers.has(key)) {
+    return specialMergers.get(key)(value, srcValue);
   }
 
   if (isArray(value) || isArray(srcValue)) {
@@ -60,5 +120,11 @@ export const mergeByCustomizerHelper: MergeWithCustomizer = (
     return mergeWith(value, srcValue, mergeByCustomizerHelper);
   }
 
+  // If value was number, choose either A if exist else B
+  if (isNumber(value) || isNumber(srcValue)) {
+    return value || srcValue;
+  }
+
+  // String & Bool
   return value > srcValue ? value : srcValue;
 };
