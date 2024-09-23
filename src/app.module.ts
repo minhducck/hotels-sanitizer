@@ -1,20 +1,33 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import { CommonModule } from './modules/common/common.module';
-import { MongooseModule } from '@nestjs/mongoose';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { DatabaseConfig } from './config/database.config';
+import { EventEmitterModule } from '@nestjs/event-emitter';
+import { DataCrawlerModule } from './modules/data-crawler/data-crawler.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
-    CommonModule,
-    MongooseModule.forRootAsync({
-      useClass: DatabaseConfig,
+    ConfigModule.forRoot({
+      cache: true,
+      isGlobal: true,
+      expandVariables: true,
+      envFilePath: ['.env', '.env.prod', '.env.dev'],
     }),
+    EventEmitterModule.forRoot({
+      wildcard: true,
+      delimiter: '.',
+      newListener: false,
+      removeListener: false,
+      maxListeners: 100,
+      verboseMemoryLeak: true,
+      ignoreErrors: false,
+    }),
+    TypeOrmModule.forRootAsync({ useClass: DatabaseConfig }),
+    CommonModule,
+    DataCrawlerModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [],
+  providers: [],
 })
 export class AppModule {}
