@@ -19,7 +19,10 @@ export class DatabaseConfig implements TypeOrmOptionsFactory {
         path.join(
           __dirname,
           '../../',
-          this.configService.getOrThrow<string>(ENV_MONGO_CONFIG_PATH.DB_PATH),
+          this.configService.get<string>(
+            ENV_MONGO_CONFIG_PATH.DB_PATH,
+            '/var/database.sqlite',
+          ),
         ),
       ),
 
