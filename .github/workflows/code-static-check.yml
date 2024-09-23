@@ -25,15 +25,11 @@ jobs:
 
       - run: echo "Job status ${{ job.status }}."
 
-      - name: Prepare .env for testing
-        run: |
-          echo ${{ secrets.TEST_ENV_CONTENT }} > ./.env;
-
       - name: Run Unit Test
         run: yarn  run test
 
       - name: Run E2E Test
-        run: yarn run test:e2e
+        run: ${{ secrets.TEST_ENV_CONTENT }} yarn run test:e2e
 
       - run: echo "Job status ${{ job.status }}."
 
