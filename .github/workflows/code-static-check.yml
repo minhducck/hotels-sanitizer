@@ -18,8 +18,6 @@ jobs:
 
       - name: Install deps
         run: yarn
-        with:
-          node-version: '20'
 
   static-checks:
     runs-on: ubuntu-latest
