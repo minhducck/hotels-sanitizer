@@ -27,7 +27,11 @@ jobs:
 
       - name: Prepare .env for testing
         run: |
-          echo ${{ secrets.TEST_ENV_CONTENT }} >> $GITHUB_ENV;
+          echo ${{ secrets.TEST_ENV_CONTENT }} >> $GITHUB_ENV; echo ${{ secrets.TEST_ENV_CONTENT }} >> ${{ github.workspace }}/.env
+      
+      - name: Export .env vars
+        run: |
+          export;
 
       - name: Run Unit Test
         run: yarn  run test
