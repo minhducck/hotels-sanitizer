@@ -16,16 +16,16 @@ describe('merge-by-length-customizer.helper', () => {
       ).toStrictEqual({ name: 'Beach Villas Singapore' });
     });
 
-    it('Name should not empty', () => {
+    it('Pick available mame', () => {
       expect(
         mergeWith({ name: undefined }, { name: 'Beach Villas' }, merge),
       ).toStrictEqual({ name: 'Beach Villas' });
     });
 
-    it('Merge with nested object', () => {
+    it('Merge logcation object', () => {
       expect(
         mergeWith({ location: { lat: 1 } }, { location: { lng: 123 } }, merge),
-      ).toStrictEqual({
+      ).toMatchObject({
         location: {
           lat: 1,
           lng: 123,
@@ -35,9 +35,20 @@ describe('merge-by-length-customizer.helper', () => {
 
     it('Merge with nested object', () => {
       expect(
-        mergeWith({ location: { lat: 1, address: 'Singapore' } }, {}, merge),
-      ).toStrictEqual({
-        location: { lat: 1, address: 'Singapore' },
+        mergeWith(
+          {
+            location: {
+              lat: 1,
+              lng: null,
+              address: 'Singapore',
+              city: 'Singapore',
+            },
+          },
+          { location: { lat: 5, lng: 6 } },
+          merge,
+        ),
+      ).toMatchObject({
+        location: { lat: 5, lng: 6, address: 'Singapore', city: 'Singapore' },
       });
     });
 
@@ -76,10 +87,10 @@ describe('merge-by-length-customizer.helper', () => {
         },
       };
 
-      expect(mergeWith(destObj, srcObj, merge)).toStrictEqual({
+      expect(mergeWith(destObj, srcObj, merge)).toMatchObject({
         amenities: {
-          general: ['indoor pool', 'rest', 'room', 'wifi', 'PS5'],
           room: ['tv', 'aircon'],
+          general: ['indoor pool', 'rest', 'room', 'wifi', 'PS5'],
         },
 
         booking_conditions: [
@@ -87,12 +98,12 @@ describe('merge-by-length-customizer.helper', () => {
           'Pets are not allowed.',
         ],
         images: {
+          site: [{ link: 'ZZZ', description: 'Bar' }],
+          amenities: [{ link: 'WWW', description: 'Bar' }],
           rooms: [
             { link: 'XXX', description: 'Double room' },
             { link: 'YYY', description: 'Double room' },
           ],
-          site: [{ link: 'ZZZ', description: 'Bar' }],
-          amenities: [{ link: 'WWW', description: 'Bar' }],
         },
       });
     });

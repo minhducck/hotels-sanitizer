@@ -2,6 +2,7 @@ import {
   isArray,
   isNumber,
   isObject,
+  merge,
   mergeWith,
   MergeWithCustomizer,
   uniq,
@@ -77,18 +78,27 @@ const mergeAmenities = (value: HotelAmenities, srcValue: HotelAmenities) => {
 };
 
 const mergeLocation = (value: HotelLocation, srcValue: HotelLocation) => {
-  value.city = value.city || srcValue.city;
-  value.country = value.country || srcValue.country;
-  value.address =
-    value.address?.length > srcValue.address?.length
+  const locationObj: Partial<HotelLocation> = {};
+  locationObj.city = value.city || srcValue.city;
+  locationObj.country = value.country || srcValue.country;
+  locationObj.address =
+    (value.address || '').length > (srcValue.address || '').length
       ? value.address
       : srcValue.address;
 
   if (srcValue.lat && srcValue.lng) {
-    value.lat = srcValue.lat;
-    value.lng = srcValue.lng;
+    locationObj.lat = srcValue.lat;
+    locationObj.lng = srcValue.lng;
+  } else if (value.lat && value.lng) {
+    locationObj.lat = value.lat;
+    locationObj.lng = value.lng;
+  } else {
+    return merge(locationObj, {
+      lat: value.lat || srcValue.lat,
+      lng: value.lng || srcValue.lng,
+    });
   }
-  return value;
+  return locationObj;
 };
 
 const specialMergers = new Map<keyof HotelModel, any>([

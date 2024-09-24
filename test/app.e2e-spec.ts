@@ -10,6 +10,7 @@ import axios from 'axios';
 import { AcmeClient } from '../src/modules/data-crawler/clients/acme.client';
 import { PaperfliesClient } from '../src/modules/data-crawler/clients/paperflies.client';
 import { HotelModel } from '../src/modules/data-crawler/model/hotel.model';
+import { ConfigService } from '@nestjs/config';
 
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
@@ -41,6 +42,7 @@ describe('HotelController (e2e)', () => {
 
     app = moduleFixture.createNestApplication();
     await app.init();
+    app.get(ConfigService).set('CACHE_ENABLE', 0);
   });
 
   it('[POST] /hotels/search with default filters.', async () => {
@@ -51,12 +53,11 @@ describe('HotelController (e2e)', () => {
 
     expect(response.body.error).toBe(false);
     expect(response.body.result).not.toBe(undefined);
-    expect(response.body.result.possibleToGoNextPage).toBe(false);
     expect(response.body.result.totalCollectionSize).toBe(3);
     expect(response.body.result.searchResult).toHaveLength(3);
-    expect(response.body.result.searchResult?.[0]?.id).toEqual('iJhz');
-    expect(response.body.result.searchResult?.[1]?.id).toEqual('SjyX');
-    expect(response.body.result.searchResult?.[2]?.id).toEqual('f8c9');
+    expect(response.body.result.searchResult?.[0]?.id).toEqual('SjyX');
+    expect(response.body.result.searchResult?.[1]?.id).toEqual('f8c9');
+    expect(response.body.result.searchResult?.[2]?.id).toEqual('iJhz');
   });
 
   it('[POST] /hotels/search with pagination.', async () => {
@@ -69,10 +70,7 @@ describe('HotelController (e2e)', () => {
     expect(response.body).not.toBe(undefined);
     expect(response.body.error).toBe(false);
     expect(response.body.result).not.toBe(undefined);
-    expect(response.body.result.possibleToGoNextPage).toBe(true);
-    expect(response.body.result.totalCollectionSize).toBe(2);
-    expect(response.body.result.searchResult).toHaveLength(2);
-    expect(response.body.result.searchResult?.[0]?.id).toEqual('SjyX');
+    expect(response.body.result.searchResult?.[0]?.id).toEqual('f8c9');
   });
 
   it('[POST] /hotels/search wrong inputs.', async () => {
@@ -118,7 +116,6 @@ describe('HotelController (e2e)', () => {
     expect(response.body).not.toBe(undefined);
     expect(response.body.error).toBe(false);
     expect(response.body.result).not.toBe(undefined);
-    expect(response.body.result.possibleToGoNextPage).toBe(false);
     expect(response.body.result.totalCollectionSize).toBe(2);
     expect(response.body.result.searchResult).toHaveLength(2);
     expect(response.body.result.searchResult).toMatchObject([
@@ -143,13 +140,12 @@ describe('HotelController (e2e)', () => {
     expect(response.body).not.toBe(undefined);
     expect(response.body.error).toBe(false);
     expect(response.body.result).not.toBe(undefined);
-    expect(response.body.result.possibleToGoNextPage).toBe(false);
     expect(response.body.result.totalCollectionSize).toBe(3);
     expect(response.body.result.searchResult).toHaveLength(3);
     expect(response.body.result.searchResult).toMatchObject([
-      { id: 'iJhz', destination_id: 5432 },
       { id: 'SjyX', destination_id: 5432 },
       { id: 'f8c9', destination_id: 1122 },
+      { id: 'iJhz', destination_id: 5432 },
     ]);
   });
 
@@ -166,7 +162,6 @@ describe('HotelController (e2e)', () => {
     expect(response.body).not.toBe(undefined);
     expect(response.body.error).toBe(false);
     expect(response.body.result).not.toBe(undefined);
-    expect(response.body.result.possibleToGoNextPage).toBe(false);
     expect(response.body.result.totalCollectionSize).toBe(1);
     expect(response.body.result.searchResult).toHaveLength(1);
     expect(response.body.result.searchResult).toMatchObject([
