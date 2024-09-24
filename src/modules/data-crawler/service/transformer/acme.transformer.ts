@@ -46,6 +46,7 @@ export class AcmeTransformer
     };
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   private parseAmenities(source: AcmeSource): HotelAmenities {
     return {};
     // return { general: source.Facilities };
