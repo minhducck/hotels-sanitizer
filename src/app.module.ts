@@ -5,6 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { DatabaseConfig } from './config/database.config';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { DataCrawlerModule } from './modules/data-crawler/data-crawler.module';
+import { AppController } from './app.controller';
 
 @Module({
   imports: [
@@ -27,7 +28,7 @@ import { DataCrawlerModule } from './modules/data-crawler/data-crawler.module';
     CommonModule,
     DataCrawlerModule,
   ],
-  controllers: [],
+  controllers: [AppController],
   providers: [],
 })
 export class AppModule {}

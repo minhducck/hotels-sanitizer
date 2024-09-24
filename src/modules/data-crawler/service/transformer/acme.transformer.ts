@@ -47,7 +47,8 @@ export class AcmeTransformer
   }
 
   private parseAmenities(source: AcmeSource): HotelAmenities {
-    return { general: source.Facilities };
+    return {};
+    // return { general: source.Facilities };
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
